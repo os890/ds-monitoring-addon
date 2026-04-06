@@ -16,20 +16,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.api;
 
 import java.io.Serializable;
 
-public interface MethodInvocationDescriptor extends Serializable
-{
+/**
+ * Describes a single monitored method invocation, including timing and exception details.
+ */
+public interface MethodInvocationDescriptor extends Serializable {
+
+    /**
+     * Returns a human-readable description of the invoked method, including
+     * class name, method name, parameter types, and optionally parameter values.
+     *
+     * @return the method details string
+     */
     String getMethodDetails();
 
+    /**
+     * Returns the wall-clock timestamp (milliseconds since epoch) when the invocation started.
+     *
+     * @return the invocation start timestamp
+     */
     long getTimestamp();
 
+    /**
+     * Returns the elapsed execution time of the invocation in milliseconds.
+     *
+     * @return the execution time in milliseconds
+     */
     long getExecutionTime();
 
     /**
-     * @return the thrown exception or null if no exception occurred
+     * Returns the exception thrown during the invocation, or {@code null} if the
+     * invocation completed normally.
+     *
+     * @return the thrown exception, or {@code null}
      */
     Throwable getException();
 }

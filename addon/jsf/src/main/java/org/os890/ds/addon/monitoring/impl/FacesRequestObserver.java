@@ -16,18 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.impl;
 
-import org.apache.deltaspike.core.api.lifecycle.Destroyed;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Destroyed;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.servlet.ServletRequest;
+
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
+
 import org.os890.ds.addon.monitoring.spi.MonitoredMethodInvocationStorage;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
-
 /*
-for supporting monitoring of other @Destroyed FacesContext observers FacesContextWrapper#release would be needed - e.g.:
+for supporting monitoring of other @Destroyed observers FacesContextWrapper#release would be needed - e.g.:
 
     @Override
     public void release()
@@ -45,14 +49,32 @@ for supporting monitoring of other @Destroyed FacesContext observers FacesContex
         }
     }
  */
+
+/**
+ * CDI observer that triggers monitoring output at the end of a JSF request.
+ *
+ * <p>Observes the standard CDI {@link Destroyed} event for {@link RequestScoped}
+ * and restarts monitoring only after the render-response phase has completed
+ * (not during a redirect).</p>
+ */
 @ApplicationScoped
-public class FacesRequestObserver
-{
-    protected void onDestroy(@Observes @Destroyed FacesContext facesContext,
-                             MonitoredMethodInvocationStorage monitoredMethodInvocationStorage)
-    {
-        if (facesContext.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE)
-        {
+public class FacesRequestObserver {
+
+    /**
+     * Restarts monitoring when the request scope is destroyed after a
+     * render-response phase, causing the accumulated invocation data to be
+     * fired as a CDI event.
+     *
+     * @param servletRequest                   the destroyed servlet request
+     * @param monitoredMethodInvocationStorage the storage to restart
+     */
+    protected void onDestroy(
+            @Observes @Destroyed(RequestScoped.class) ServletRequest servletRequest,
+            MonitoredMethodInvocationStorage monitoredMethodInvocationStorage) {
+
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+
+        if (facesContext != null && facesContext.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
             //process after rendering (and not in case of a release for a redirect)
             monitoredMethodInvocationStorage.restartMonitoring();
         }

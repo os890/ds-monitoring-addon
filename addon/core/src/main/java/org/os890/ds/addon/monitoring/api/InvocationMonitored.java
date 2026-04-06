@@ -16,23 +16,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.api;
 
-import javax.enterprise.util.Nonbinding;
-import javax.interceptor.InterceptorBinding;
-import java.lang.annotation.*;
+import jakarta.enterprise.util.Nonbinding;
+import jakarta.interceptor.InterceptorBinding;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Interceptor binding annotation that marks a method or type for invocation monitoring.
+ *
+ * <p>When applied to a method or class, all invocations will be recorded and made
+ * available through the {@link org.os890.ds.addon.monitoring.spi.MonitoredMethodInvocationStorage}.
+ * At the end of a request, the collected invocations are fired as a
+ * {@link org.os890.ds.addon.monitoring.api.event.MonitoredMethodInvocationsEvent} CDI event.</p>
+ */
 @InterceptorBinding
 @Documented
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface InvocationMonitored
-{
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface InvocationMonitored {
+
+    /**
+     * If {@code true}, only invocations that result in an exception are recorded.
+     *
+     * @return whether to monitor exceptions only
+     */
     @Nonbinding boolean exceptionsOnly() default false;
 
-    //TODO discuss: @Nonbinding Class[] exceptionsToIgnore() default {};
-    //for business-exceptions which shouldn't get logged - currently it can be done manually
-
+    /**
+     * If {@code true}, method parameter values are omitted from the recorded details.
+     *
+     * @return whether to ignore method parameter values
+     */
     @Nonbinding boolean ignoreMethodParameterValues() default true;
 }

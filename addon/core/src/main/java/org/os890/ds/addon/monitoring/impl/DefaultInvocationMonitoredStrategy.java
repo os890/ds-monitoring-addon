@@ -16,7 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.impl;
+
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.inject.Inject;
+import jakarta.interceptor.InvocationContext;
 
 import org.apache.deltaspike.core.util.ExceptionUtils;
 import org.os890.ds.addon.monitoring.api.InvocationMonitored;
@@ -25,15 +31,23 @@ import org.os890.ds.addon.monitoring.api.literal.InvocationMonitoredLiteral;
 import org.os890.ds.addon.monitoring.spi.InvocationMonitoredStrategy;
 import org.os890.ds.addon.monitoring.spi.MonitoredMethodInvocationStorage;
 
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
-import javax.interceptor.InvocationContext;
+/**
+ * Default strategy that records method invocations with timing and exception information.
+ *
+ * <p>If the {@link InvocationMonitored} annotation is found on the intercepted method
+ * or its declaring class, the annotation attributes are used to control recording
+ * behavior. Otherwise, the annotation defaults apply.</p>
+ */
+@Dependent
+@SuppressWarnings("serial")
+public class DefaultInvocationMonitoredStrategy implements InvocationMonitoredStrategy {
 
-public class DefaultInvocationMonitoredStrategy implements InvocationMonitoredStrategy
-{
+    private static final long serialVersionUID = 1L;
+
     //needed for supporting dyn. added annotations (at least with default values)
     private static final boolean MONITOR_EXCEPTIONS_ONLY_DEFAULT =
         new InvocationMonitoredLiteral().exceptionsOnly();
+
     //needed for supporting dyn. added annotations (at least with default values)
     private static final boolean IGNORE_METHOD_PARAMETER_VALUES_DEFAULT =
         new InvocationMonitoredLiteral().ignoreMethodParameterValues();
@@ -45,37 +59,29 @@ public class DefaultInvocationMonitoredStrategy implements InvocationMonitoredSt
     private BeanManager beanManager;
 
     @Override
-    public Object execute(InvocationContext invocationContext) throws Exception
-    {
+    public Object execute(InvocationContext invocationContext) throws Exception {
         long startAt = System.currentTimeMillis();
 
         Throwable throwable = null;
 
-        try
-        {
+        try {
             return invocationContext.proceed();
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             throwable = t;
             throw ExceptionUtils.throwAsRuntimeException(t);
-        }
-        finally
-        {
+        } finally {
             long executionTime = System.currentTimeMillis() - startAt;
 
             boolean monitorExceptionsOnly = MONITOR_EXCEPTIONS_ONLY_DEFAULT;
             boolean ignoreMethodParameterValues = IGNORE_METHOD_PARAMETER_VALUES_DEFAULT;
 
             InvocationMonitored invocationMonitored = getInvocationMonitored(invocationContext);
-            if (invocationMonitored != null)
-            {
+            if (invocationMonitored != null) {
                 monitorExceptionsOnly = invocationMonitored.exceptionsOnly();
                 ignoreMethodParameterValues = invocationMonitored.ignoreMethodParameterValues();
             }
 
-            if (!monitorExceptionsOnly || throwable != null)
-            {
+            if (!monitorExceptionsOnly || throwable != null) {
                 MethodInvocationDescriptor methodInvocationDescriptor = createMethodInvocationEntry(
                     invocationContext, startAt, executionTime, throwable, ignoreMethodParameterValues);
                 this.monitoredMethodInvocationStorage.addMethodInvocation(methodInvocationDescriptor);
@@ -83,24 +89,37 @@ public class DefaultInvocationMonitoredStrategy implements InvocationMonitoredSt
         }
     }
 
-    protected InvocationMonitored getInvocationMonitored(InvocationContext invocationContext)
-    {
+    /**
+     * Resolves the {@link InvocationMonitored} annotation from the invocation context.
+     *
+     * @param invocationContext the interceptor invocation context
+     * @return the annotation, or {@code null} if not present
+     */
+    protected InvocationMonitored getInvocationMonitored(InvocationContext invocationContext) {
         InvocationMonitored invocationMonitored = AnnotationUtils.extractAnnotationFromMethodOrClass(
                 this.beanManager, invocationContext.getMethod(), InvocationMonitored.class);
 
-        if (invocationMonitored != null)
-        {
+        if (invocationMonitored != null) {
             return invocationMonitored;
         }
         return null;
     }
 
+    /**
+     * Creates a {@link MethodInvocationDescriptor} for the given invocation.
+     *
+     * @param invocationContext          the interceptor invocation context
+     * @param timestamp                  the invocation start timestamp
+     * @param executionTime              the elapsed execution time in milliseconds
+     * @param throwable                  the exception thrown, or {@code null}
+     * @param ignoreMethodParameterValues whether to omit parameter values
+     * @return the invocation descriptor
+     */
     protected MethodInvocationDescriptor createMethodInvocationEntry(InvocationContext invocationContext,
                                                                      long timestamp,
                                                                      long executionTime,
                                                                      Throwable throwable,
-                                                                     boolean ignoreMethodParameterValues)
-    {
+                                                                     boolean ignoreMethodParameterValues) {
         return new DefaultMethodInvocationDescriptor(
             invocationContext, timestamp, executionTime, throwable, ignoreMethodParameterValues);
     }

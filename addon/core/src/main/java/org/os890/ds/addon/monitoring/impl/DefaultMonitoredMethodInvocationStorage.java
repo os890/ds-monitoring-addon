@@ -16,48 +16,53 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.impl;
+
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.inject.Inject;
 
 import org.os890.ds.addon.monitoring.api.MethodInvocationDescriptor;
 import org.os890.ds.addon.monitoring.api.event.MonitoredMethodInvocationsEvent;
 import org.os890.ds.addon.monitoring.spi.MonitoredMethodInvocationStorage;
 
-import javax.annotation.PreDestroy;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
 import java.util.List;
 
+/**
+ * Request-scoped storage for monitored method invocations.
+ *
+ * <p>Collects invocation descriptors during a request and fires a
+ * {@link MonitoredMethodInvocationsEvent} CDI event when the request scope
+ * is destroyed or {@link #restartMonitoring()} is called explicitly.</p>
+ */
 @RequestScoped
-public class DefaultMonitoredMethodInvocationStorage implements MonitoredMethodInvocationStorage
-{
+public class DefaultMonitoredMethodInvocationStorage implements MonitoredMethodInvocationStorage {
+
     @Inject
     private BeanManager beanManager;
 
     private MonitoredMethodInvocationsEvent methodInvocationsEvent = new MonitoredMethodInvocationsEvent();
 
     @Override
-    public void addMethodInvocation(MethodInvocationDescriptor methodInvocationDescriptor)
-    {
+    public void addMethodInvocation(MethodInvocationDescriptor methodInvocationDescriptor) {
         this.methodInvocationsEvent.getMethodInvocationDescriptors().add(methodInvocationDescriptor);
     }
 
     @Override
-    public List<MethodInvocationDescriptor> getMethodInvocations()
-    {
+    public List<MethodInvocationDescriptor> getMethodInvocations() {
         return methodInvocationsEvent.getMethodInvocationDescriptors();
     }
 
     @PreDestroy
     @Override
-    public void restartMonitoring()
-    {
+    public void restartMonitoring() {
         MonitoredMethodInvocationsEvent monitoringResult = this.methodInvocationsEvent;
         this.methodInvocationsEvent = new MonitoredMethodInvocationsEvent();
 
-        if (!monitoringResult.getMethodInvocationDescriptors().isEmpty())
-        {
-            this.beanManager.fireEvent(monitoringResult);
+        if (!monitoringResult.getMethodInvocationDescriptors().isEmpty()) {
+            this.beanManager.getEvent().fire(monitoringResult);
         }
     }
 }

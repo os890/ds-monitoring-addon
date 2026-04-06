@@ -17,18 +17,24 @@
  * under the License.
  */
 
-package org.os890.ds.addon.monitoring.api;
+package org.os890.ds.addon.monitoring;
+
+import org.junit.jupiter.api.Test;
+import org.os890.ds.addon.monitoring.api.event.MonitoredMethodInvocationsEvent;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Extension of {@link MethodInvocationDescriptor} that also captures the
- * JSF view ID that was active when the invocation occurred.
+ * Unit tests for {@link MonitoredMethodInvocationsEvent}.
  */
-public interface ViewAwareMethodInvocationDescriptor extends MethodInvocationDescriptor {
+class MonitoredMethodInvocationsEventTest {
 
-    /**
-     * Returns the JSF view ID that was active at the time of the method invocation.
-     *
-     * @return the active view ID, or {@code "unknown"} if unavailable
-     */
-    String getActiveViewId();
+    @Test
+    void newEventHasEmptyList() {
+        MonitoredMethodInvocationsEvent event = new MonitoredMethodInvocationsEvent();
+
+        assertNotNull(event.getMethodInvocationDescriptors());
+        assertTrue(event.getMethodInvocationDescriptors().isEmpty());
+    }
 }

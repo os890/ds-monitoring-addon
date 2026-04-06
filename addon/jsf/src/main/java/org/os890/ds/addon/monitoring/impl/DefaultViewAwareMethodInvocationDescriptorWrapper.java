@@ -16,67 +16,70 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.impl;
+
+import jakarta.faces.context.FacesContext;
 
 import org.os890.ds.addon.monitoring.api.MethodInvocationDescriptor;
 import org.os890.ds.addon.monitoring.api.ViewAwareMethodInvocationDescriptor;
 
-import javax.faces.context.FacesContext;
+/**
+ * Wrapper that decorates a {@link MethodInvocationDescriptor} with the
+ * currently active JSF view ID.
+ */
+public class DefaultViewAwareMethodInvocationDescriptorWrapper
+        implements ViewAwareMethodInvocationDescriptor {
 
-public class DefaultViewAwareMethodInvocationDescriptorWrapper implements ViewAwareMethodInvocationDescriptor
-{
+    private static final long serialVersionUID = 1L;
+
     private final MethodInvocationDescriptor wrapped;
     private final String viewId;
 
-    public DefaultViewAwareMethodInvocationDescriptorWrapper(MethodInvocationDescriptor wrapped)
-    {
+    /**
+     * Creates a new wrapper, capturing the current JSF view ID.
+     *
+     * @param wrapped the original method invocation descriptor to wrap
+     */
+    public DefaultViewAwareMethodInvocationDescriptorWrapper(MethodInvocationDescriptor wrapped) {
         this.wrapped = wrapped;
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
 
-        if (facesContext != null && facesContext.getViewRoot() != null)
-        {
+        if (facesContext != null && facesContext.getViewRoot() != null) {
             this.viewId = facesContext.getViewRoot().getViewId();
-        }
-        else
-        {
+        } else {
             this.viewId = "unknown";
         }
     }
 
     @Override
-    public String getMethodDetails()
-    {
+    public String getMethodDetails() {
         return this.wrapped.getMethodDetails();
     }
 
     @Override
-    public long getTimestamp()
-    {
+    public long getTimestamp() {
         return this.wrapped.getTimestamp();
     }
 
     @Override
-    public long getExecutionTime()
-    {
+    public long getExecutionTime() {
         return this.wrapped.getExecutionTime();
     }
 
     @Override
-    public Throwable getException()
-    {
+    public Throwable getException() {
         return this.wrapped.getException();
     }
 
     @Override
-    public String getActiveViewId()
-    {
+    public String getActiveViewId() {
         return this.viewId;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "[" + this.viewId + "] " + this.wrapped.toString();
     }
 }

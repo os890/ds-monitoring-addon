@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.api.event;
 
 import org.os890.ds.addon.monitoring.api.MethodInvocationDescriptor;
@@ -23,13 +24,25 @@ import org.os890.ds.addon.monitoring.api.MethodInvocationDescriptor;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class MonitoredMethodInvocationsEvent
-{
-    private List<MethodInvocationDescriptor> methodInvocationDescriptors =
-        new CopyOnWriteArrayList<MethodInvocationDescriptor>();
+/**
+ * CDI event that carries the list of monitored method invocations collected
+ * during a request or monitoring cycle.
+ *
+ * <p>Observers of this event receive the accumulated invocation data when
+ * monitoring is restarted (typically at the end of an HTTP request).</p>
+ */
+public class MonitoredMethodInvocationsEvent {
 
-    public List<MethodInvocationDescriptor> getMethodInvocationDescriptors()
-    {
+    private final List<MethodInvocationDescriptor> methodInvocationDescriptors =
+        new CopyOnWriteArrayList<>();
+
+    /**
+     * Returns the thread-safe list of method invocation descriptors collected
+     * during the current monitoring cycle.
+     *
+     * @return the list of method invocation descriptors
+     */
+    public List<MethodInvocationDescriptor> getMethodInvocationDescriptors() {
         return this.methodInvocationDescriptors;
     }
 }

@@ -16,17 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.spi;
 
 import org.os890.ds.addon.monitoring.api.MethodInvocationDescriptor;
 
 import java.util.List;
 
-public interface MonitoredMethodInvocationStorage
-{
+/**
+ * Storage abstraction for monitored method invocations collected during a
+ * request or monitoring cycle.
+ *
+ * <p>Implementations are responsible for accumulating invocation records and
+ * publishing them as a CDI event when {@link #restartMonitoring()} is called.</p>
+ */
+public interface MonitoredMethodInvocationStorage {
+
+    /**
+     * Adds a method invocation descriptor to the current monitoring cycle.
+     *
+     * @param methodInvocationDescriptor the descriptor to add
+     */
     void addMethodInvocation(MethodInvocationDescriptor methodInvocationDescriptor);
 
+    /**
+     * Returns the list of method invocation descriptors collected so far.
+     *
+     * @return the list of invocation descriptors
+     */
     List<MethodInvocationDescriptor> getMethodInvocations();
 
+    /**
+     * Fires a {@link org.os890.ds.addon.monitoring.api.event.MonitoredMethodInvocationsEvent}
+     * with the collected invocations and resets the storage for the next cycle.
+     */
     void restartMonitoring();
 }

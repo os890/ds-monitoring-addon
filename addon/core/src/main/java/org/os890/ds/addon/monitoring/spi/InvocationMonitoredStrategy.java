@@ -16,10 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.spi;
 
 import org.apache.deltaspike.core.spi.InterceptorStrategy;
 
-public interface InvocationMonitoredStrategy extends InterceptorStrategy
-{
+/**
+ * Strategy interface for processing monitored method invocations.
+ *
+ * <p>Extends the DeltaSpike {@link InterceptorStrategy} SPI so that
+ * implementations can be plugged in as CDI beans. The default implementation is
+ * {@link org.os890.ds.addon.monitoring.impl.DefaultInvocationMonitoredStrategy}.</p>
+ */
+public interface InvocationMonitoredStrategy extends InterceptorStrategy {
 }

@@ -16,46 +16,55 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.monitoring.api.literal;
+
+import jakarta.enterprise.util.AnnotationLiteral;
 
 import org.apache.deltaspike.core.util.metadata.AnnotationInstanceProvider;
 import org.os890.ds.addon.monitoring.api.InvocationMonitored;
 
-import javax.enterprise.util.AnnotationLiteral;
-
 /**
- * Literal for the {@link InvocationMonitoredLiteral} annotation.
+ * {@link AnnotationLiteral} for the {@link InvocationMonitored} annotation,
+ * allowing programmatic creation of annotation instances.
  */
-public class InvocationMonitoredLiteral extends AnnotationLiteral<InvocationMonitored> implements InvocationMonitored
-{
+public class InvocationMonitoredLiteral
+        extends AnnotationLiteral<InvocationMonitored> implements InvocationMonitored {
+
     private static final long serialVersionUID = -7623640277155878657L;
+
     private static final InvocationMonitored DEFAULT_INVOCATION_MONITORED =
         AnnotationInstanceProvider.of(InvocationMonitored.class);
 
     private final boolean exceptionsOnly;
     private final boolean ignoreMethodParameterValues;
 
-    public InvocationMonitoredLiteral()
-    {
+    /**
+     * Creates a literal with default attribute values matching the annotation defaults.
+     */
+    public InvocationMonitoredLiteral() {
         this.exceptionsOnly = DEFAULT_INVOCATION_MONITORED.exceptionsOnly();
         this.ignoreMethodParameterValues = DEFAULT_INVOCATION_MONITORED.ignoreMethodParameterValues();
     }
 
-    public InvocationMonitoredLiteral(boolean exceptionsOnly, boolean ignoreMethodParameterValues)
-    {
+    /**
+     * Creates a literal with the specified attribute values.
+     *
+     * @param exceptionsOnly             whether to monitor exceptions only
+     * @param ignoreMethodParameterValues whether to ignore method parameter values
+     */
+    public InvocationMonitoredLiteral(boolean exceptionsOnly, boolean ignoreMethodParameterValues) {
         this.exceptionsOnly = exceptionsOnly;
         this.ignoreMethodParameterValues = ignoreMethodParameterValues;
     }
 
     @Override
-    public boolean exceptionsOnly()
-    {
+    public boolean exceptionsOnly() {
         return this.exceptionsOnly;
     }
 
     @Override
-    public boolean ignoreMethodParameterValues()
-    {
+    public boolean ignoreMethodParameterValues() {
         return this.ignoreMethodParameterValues;
     }
 }

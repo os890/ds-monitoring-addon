@@ -17,88 +17,55 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.os890.ds.addon</groupId>
+        <artifactId>ds-monitoring-addon-project</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
     <packaging>jar</packaging>
 
-    <groupId>org.os890.ds.addon</groupId>
     <artifactId>ds-monitoring-addon-jsf</artifactId>
 
     <name>DS-Monitoring Add-on JSF</name>
-    <version>1.0.0</version>
-
-    <properties>
-        <ds.version>0.6</ds.version>
-    </properties>
-
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>googlecode.com</id>
-            <url>svn:https://os890-m2-repository.googlecode.com/svn/tags/apache-extras</url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>apache</id>
-            <url>http://repo1.maven.org/maven2</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.os890.ds.addon</groupId>
             <artifactId>ds-monitoring-addon-core</artifactId>
-            <version>1.0.0</version>
-            <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.deltaspike.core</groupId>
             <artifactId>deltaspike-core-api</artifactId>
-            <version>${ds.version}</version>
-            <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.apache.myfaces.core</groupId>
-            <artifactId>myfaces-api</artifactId>
-            <version>2.1.14</version>
-            <scope>provided</scope>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-atinject_1.0_spec</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
+            <groupId>jakarta.faces</groupId>
+            <artifactId>jakarta.faces-api</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jcdi_1.0_spec</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -108,23 +75,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
         </plugins>
-
-        <extensions>
-            <extension>
-                <groupId>org.jvnet.wagon-svn</groupId>
-                <artifactId>wagon-svn</artifactId>
-                <version>1.8</version>
-            </extension>
-        </extensions>
     </build>
 
 </project>

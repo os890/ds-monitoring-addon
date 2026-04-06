@@ -22,13 +22,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.os890.ds.addon</groupId>
+        <artifactId>ds-monitoring-feasibility-study</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
     <packaging>pom</packaging>
 
-    <groupId>org.os890.ds.addon</groupId>
     <artifactId>ds-monitoring-addon-project</artifactId>
 
     <name>DS-Monitoring Add-on Project</name>
-    <version>1.0.0</version>
 
     <modules>
         <module>core</module>
